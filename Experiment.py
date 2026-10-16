@@ -1,6 +1,7 @@
 import copy
 import numpy as np
 import Tree as tree
+import math
 
 # stop with a clear message if the wrong file was loaded
 if not hasattr(tree, "grow"):
@@ -63,9 +64,9 @@ def paired_ttest_5x2(a, b):
         return float("nan"), float("nan")
     t = d1[0] / np.sqrt(variance.mean())
 
-    try:
-        from scipy import stats
-        p = 2 * stats.t.sf(abs(t), df=5)
-    except ImportError:
-        p = float("nan")
+    # two-sided p-value for a t distribution with 5 degrees of freedom
+    theta = math.atan(abs(t) / math.sqrt(5))
+    inside = 2 / math.pi * (theta + math.sin(theta) * math.cos(theta)
+                            * (1 + 2 / 3 * math.cos(theta) ** 2))
+    p = 1 - inside
     return t, p
